@@ -1326,7 +1326,7 @@ function saveImage(layer) {
 
 function saveSettings() {
   var data = {
-    type: "InteractiveHtmlBom settings",
+    type: "hiibrarahmad settings",
     version: 1,
     pcbmetadata: pcbdata.metadata,
     settings: settings,
@@ -1350,11 +1350,11 @@ function loadSettings() {
       try {
         newSettings = JSON.parse(content);
       } catch (e) {
-        alert("Selected file is not InteractiveHtmlBom settings file.");
+        alert("Selected file is not hiibrarahmad settings file.");
         return;
       }
-      if (newSettings.type != "InteractiveHtmlBom settings") {
-        alert("Selected file is not InteractiveHtmlBom settings file.");
+      if (newSettings.type != "hiibrarahmad settings") {
+        alert("Selected file is not hiibrarahmad settings file.");
         return;
       }
       var metadataMatches = newSettings.hasOwnProperty("pcbmetadata");
@@ -3979,7 +3979,7 @@ function populateMetadata() {
   document.getElementById("stats-smd-pads-total").innerHTML = pads_f + pads_b;
   document.getElementById("stats-th-pads").innerHTML = pads_th;
   // Update version string
-  document.getElementById("github-link").innerHTML = "InteractiveHtmlBom&nbsp;" +
+  document.getElementById("github-link").innerHTML = "hiibrarahmad&nbsp;" +
     /^v\d+\.\d+/.exec(pcbdata.ibom_version)[0];
 }
 
@@ -4500,8 +4500,8 @@ window.matchMedia("print").addListener(resizeAll);
           <label class="menu-label">
             <span class="shameless-plug">
               <span>Created using</span>
-              <a id="github-link" target="blank" href="https://github.com/openscopeproject/InteractiveHtmlBom">InteractiveHtmlBom</a>
-              <a target="blank" title="Mouse and keyboard help" href="https://github.com/openscopeproject/InteractiveHtmlBom/wiki/Usage#bom-page-mouse-actions" style="text-decoration: none;"><label class="help-link">?</label></a>
+              <a id="github-link" target="blank" href="https://github.com/hiibrarahmad">hiibrarahmad</a>
+              <a target="blank" title="Mouse and keyboard help" href="https://github.com/hiibrarahmad" style="text-decoration: none;"><label class="help-link">?</label></a>
             </span>
           </label>
         </div>
