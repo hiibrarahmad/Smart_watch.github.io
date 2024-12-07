@@ -1,0 +1,4 @@
+Record=DiagramHierarchy|SourceDocument=smart_watch.MbsDoc|Kind=Multi-board Schematic Module|Designator=2|Source=Charge\Wireless_Board.PrjPcb
+Record=SubProject|SourceDocument=smart_watch.MbsDoc|ProjectPath=Charge\Wireless_Board.PrjPcb
+Record=DiagramHierarchy|SourceDocument=smart_watch.MbsDoc|Kind=Multi-board Schematic Module|Designator=1|Source=Main_board\Main_board.PrjPcb
+Record=SubProject|SourceDocument=smart_watch.MbsDoc|ProjectPath=Main_board\Main_board.PrjPcb
