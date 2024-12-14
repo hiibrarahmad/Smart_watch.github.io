@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>3D Model Viewer</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #5c5555; /* Light grey background */
+        font-family: Geneva, sans-serif;
+        color: rgba(0, 0, 0, 0.7); /* Semi-transparent black text */
+      }
+      #viewer {
+        width: 100vw; 
+        height: 100vh; 
+        background: #9b9494; /* Light grey background */
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <script src="./dist/js-3d-model-viewer.js"></script>
+  </head>
+
+  <body>
+    <div id="viewer"></div>
+    <script>
+      // Initialize the 3D model viewer
+      var modelPlayer = this.Js3dModelViewer;
+      var viewerElement = document.getElementById('viewer');
+      var scene = modelPlayer.prepareScene(viewerElement, {
+        grid: false, // Disable grid for simplicity
+        background: '#D3D3D3' // Light grey background
+      });
+
+      // Automatically load Sample 2 on page load
+      modelPlayer.loadObject(
+        scene,
+        './assets/Watch v99 v2.obj', 
+        './assets/Watch v99 v2.mtl',
+        function () {
+          console.log("Sample 2 loaded successfully");
+        }
+      );
+
+      // Ensure full-screen mode is always enabled
+      modelPlayer.goFullScreen(viewerElement);
+    </script>
+  </body>
+</html>
