@@ -72,20 +72,25 @@
       );
 
       // 4) Fullscreen toggle, with exit support & prefix fallbacks
-      fsBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement &&
-            !document.webkitFullscreenElement) {
-          const req = viewer.requestFullscreen
-                   || viewer.webkitRequestFullscreen;
-          req.call(viewer);
-          fsBtn.textContent = '⤢ Exit Fullscreen';
-        } else {
-          const exit = document.exitFullscreen
-                     || document.webkitExitFullscreen;
-          exit.call(document);
-          fsBtn.textContent = '⤢ Fullscreen';
-        }
-      });
+      fsBtn.addEventListener('click', (e) => {
+  console.log('User click isTrusted:', e.isTrusted);  // should be true
+
+  // Vendor-prefixed fallbacks:
+  if (viewer.requestFullscreen) {
+    viewer.requestFullscreen();
+  } else if (viewer.webkitRequestFullscreen) {
+    viewer.webkitRequestFullscreen();
+  } else if (viewer.msRequestFullscreen) {
+    viewer.msRequestFullscreen();
+  }
+
+  // Update button text *after* the call
+  if (document.fullscreenElement) {
+    fsBtn.textContent = '⤢ Exit Fullscreen';
+  } else {
+    fsBtn.textContent = '⤢ Fullscreen';
+  }
+});
 
       // 5) Explode/reset toggle
       explodeBtn.addEventListener('click', () => {
