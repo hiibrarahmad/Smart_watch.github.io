@@ -2,211 +2,111 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>3D Model Viewer</title>
     <style>
-      * { box-sizing:border-box; }
       html, body { margin:0; padding:0; height:100%; overflow:hidden; }
-      body {
-        background: #5c5555;
-        font-family: Geneva, sans-serif;
-        color: rgba(0,0,0,0.7);
-      }
-      #viewer {
-        width:100%; height:100%;
-        background:#9b9494;
-        position:relative;
-      }
+      #viewer { width:100%; height:100%; background:#9b9494; position:relative; }
       #viewer canvas { display:block; width:100%; height:100%; }
-
-      /* Loading overlay */
-      #loading {
-        position:absolute;
-        top:0; left:0; right:0; bottom:0;
-        background: rgba(255,255,255,0.9);
-        display:flex; flex-direction:column;
-        align-items:center; justify-content:center;
-        transition:opacity 0.4s ease;
-        z-index:10;
-      }
-      .spinner {
-        width:50px; height:50px;
-        border:5px solid #ddd;
-        border-top:5px solid #555;
-        border-radius:50%;
-        animation:spin 1s linear infinite;
-        margin-bottom:1em;
-      }
-      @keyframes spin { to { transform: rotate(360deg); } }
-
-      /* Error box */
-      #error {
-        position:absolute;
-        top:50%; left:50%;
-        transform:translate(-50%,-50%);
-        background:rgba(255,255,255,0.9);
-        color:#800; padding:1em 1.5em;
-        border-radius:4px; text-align:center;
-        display:none; z-index:20;
-      }
-
-      /* UI buttons */
-      #ui {
-        position:absolute;
-        top:20px; right:20px;
-        display:flex; gap:0.5em;
-        z-index:15;
-      }
-      .btn {
-        background: rgba(0,0,0,0.6);
-        color: #fff;
-        border: none;
-        padding: 0.4em 0.8em;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-      .btn:hover { background: rgba(0,0,0,0.8); }
-
-      /* Control hints */
-      #controls {
-        position:absolute;
-        bottom:20px; left:50%;
-        transform: translateX(-50%);
-        background: rgba(255,255,255,0.8);
-        padding:0.5em 1em;
-        border-radius:4px;
-        font-size:0.9rem;
-        display:flex; gap:1em;
-      }
+      #ui { position:absolute; top:20px; right:20px; display:flex; gap:0.5em; z-index:15; }
+      .btn { background:rgba(0,0,0,0.6); color:#fff; border:none; padding:.4em .8em; border-radius:4px; cursor:pointer; }
+      .btn:hover { background:rgba(0,0,0,0.8); }
     </style>
     <script src="./dist/js-3d-model-viewer.js"></script>
   </head>
-
   <body>
-    <div id="viewer">
-      <div id="loading">
-        <div class="spinner"></div>
-        <div>Loading 3D model…</div>
-      </div>
-      <div id="error">⚠️ Failed to load model.<br/>Check console & network.</div>
-
-      <div id="ui">
-        <button id="fsBtn" class="btn">⤢ Fullscreen</button>
-        <button id="explodeBtn" class="btn">💥 Explode</button>
-      </div>
-
-      <div id="controls">
-        <span>🖱️ Drag to rotate</span>
-        <span>🔎 Scroll to zoom</span>
-      </div>
+    <div id="viewer"></div>
+    <div id="ui">
+      <button id="fsBtn" class="btn">⤢ Fullscreen</button>
+      <button id="explodeBtn" class="btn">💥 Explode</button>
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const viewer    = document.getElementById('viewer');
-        const loading   = document.getElementById('loading');
-        const errorEl   = document.getElementById('error');
-        const fsBtn     = document.getElementById('fsBtn');
-        const explodeBtn= document.getElementById('explodeBtn');
+    document.addEventListener('DOMContentLoaded', () => {
+      const viewer    = document.getElementById('viewer');
+      const fsBtn     = document.getElementById('fsBtn');
+      const explodeBtn= document.getElementById('explodeBtn');
+      const meshInfos = [];
+      let exploded    = false;
 
-        // Prepare the scene
-        const scene = Js3dModelViewer.prepareScene(viewer, {
-          grid:       true,
-          axesHelper: true,
-          fog:        { color:'#9b9494', near:5, far:30 },
-          background: '#D3D3D3',
-          camera: {
-            position: [0,2,6],
-            fov:      50,
-            near:     0.1,
-            far:      1000
-          },
-          lights: [
-            { type:'ambient',     color:'#ffffff', intensity:0.4 },
-            { type:'directional', color:'#ffffff', intensity:0.8, position:[5,10,5] }
-          ],
-          controls: {
-            enableDamping: true,
-            dampingFactor: 0.07,
-            rotateSpeed:   0.5,
-            zoomSpeed:     1.2
-          }
-        });
+      // 1) Prepare the scene (your existing options)
+      const scene = Js3dModelViewer.prepareScene(viewer, {
+        grid:true, axesHelper:true, fog:{color:'#9b9494',near:5,far:30},
+        background:'#D3D3D3',
+        camera:{position:[0,2,6],fov:50, near:0.1,far:1000},
+        lights:[
+          {type:'ambient',color:'#fff',intensity:0.4},
+          {type:'directional',color:'#fff',intensity:0.8,position:[5,10,5]}
+        ],
+        controls:{enableDamping:true,dampingFactor:0.07,rotateSpeed:0.5,zoomSpeed:1.2}
+      });
 
-        // Hide spinner when ready
-        loading.style.display = 'none';
+      // 2) Your exact file lines (unchanged)
+      const objUrl = '/src/assets/sample_02.obj';
+      const mtlUrl = '/src/assets/sample_02.mtl';
+      console.log('📡 fetching:', objUrl, mtlUrl);
 
-        // 3. point at the EXACT files you see under src/assets/
-        const objUrl = '/src/assets/sample_02.obj';
-        const mtlUrl = '/src/assets/sample_02.mtl';
-        console.log('📡 fetching:', objUrl, mtlUrl);
+      // 3) Load WITHOUT passing an options‐object—just scene, URLs, onLoad, onError
+      Js3dModelViewer.loadObject(
+        scene,
+        objUrl,
+        mtlUrl,
 
-        // Store each mesh for explode/reset
-        const meshInfos = [];
-        let exploded = false;
-
-        // Load the model
-        Js3dModelViewer.loadObject(
-          scene,
-          objUrl,
-          mtlUrl,
-          { scale:1.0, position:[0,0,0], rotation:[0,Math.PI*0.5,0] },
-
-          // onSuccess receives the root object
-          (root) => {
-            console.log('✅ Model loaded successfully');
-            root.traverse(child => {
-              if (child.isMesh) {
-                meshInfos.push({
-                  mesh: child,
-                  originalPos: child.position.clone()
-                });
-              }
-            });
-          },
-
-          // onError
-          (err) => {
-            console.error('❌ Model load error:', err);
-            loading.style.display = 'none';
-            errorEl.style.display   = 'block';
-          }
-        );
-
-        // Fullscreen toggle
-        fsBtn.addEventListener('click', () => {
-          if (!document.fullscreenElement) {
-            viewer.requestFullscreen().then(() => {
-              fsBtn.textContent = '⤢ Exit Fullscreen';
-            });
-          } else {
-            document.exitFullscreen().then(() => {
-              fsBtn.textContent = '⤢ Fullscreen';
-            });
-          }
-        });
-
-        // Explode / Reset toggle
-        explodeBtn.addEventListener('click', () => {
-          exploded = !exploded;
-          explodeBtn.textContent = exploded ? '🔧 Reset' : '💥 Explode';
-
-          meshInfos.forEach(({mesh, originalPos}) => {
-            if (exploded) {
-              // push out along its normalized world direction
-              const worldPos = mesh.getWorldPosition(new window.THREE.Vector3());
-              const dir = worldPos.clone().normalize();
-              mesh.position.copy(
-                originalPos.clone().add(dir.multiplyScalar(1.5))
-              );
-            } else {
-              // return to original
-              mesh.position.copy(originalPos);
+        // onLoad(root):
+        (root) => {
+          console.log('✅ Model loaded', root);
+          root.traverse(child => {
+            if (child.isMesh) {
+              meshInfos.push({
+                mesh: child,
+                originalPos: child.position.clone()
+              });
             }
           });
+          if (!meshInfos.length) console.warn('No meshes found to explode!');
+        },
+
+        // onError(err):
+        (err) => {
+          console.error('❌ Load error:', err);
+        }
+      );
+
+      // 4) Fullscreen toggle, with exit support & prefix fallbacks
+      fsBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement &&
+            !document.webkitFullscreenElement) {
+          const req = viewer.requestFullscreen
+                   || viewer.webkitRequestFullscreen;
+          req.call(viewer);
+          fsBtn.textContent = '⤢ Exit Fullscreen';
+        } else {
+          const exit = document.exitFullscreen
+                     || document.webkitExitFullscreen;
+          exit.call(document);
+          fsBtn.textContent = '⤢ Fullscreen';
+        }
+      });
+
+      // 5) Explode/reset toggle
+      explodeBtn.addEventListener('click', () => {
+        if (!meshInfos.length) return;  // nothing to do
+        exploded = !exploded;
+        explodeBtn.textContent = exploded ? '🔧 Reset' : '💥 Explode';
+        meshInfos.forEach(({mesh, originalPos}) => {
+          if (exploded) {
+            // push each mesh outwards
+            const worldPos = mesh.getWorldPosition(new window.THREE.Vector3());
+            const dir = worldPos.clone().normalize();
+            mesh.position.copy(
+              originalPos.clone().add(dir.multiplyScalar(1.5))
+            );
+          } else {
+            // reset to original
+            mesh.position.copy(originalPos);
+          }
         });
       });
+    });
     </script>
   </body>
 </html>
