@@ -1,51 +1,50 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>3D Model Viewer</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #5c5555; /* Light grey background */
-        font-family: Geneva, sans-serif;
-        color: rgba(0, 0, 0, 0.7); /* Semi-transparent black text */
-      }
-      #viewer {
-        width: 100vw; 
-        height: 100vh; 
-        background: #9b9494; /* Light grey background */
-      }
-      canvas {
-        display: block;
-      }
-    </style>
-    <script src="./dist/js-3d-model-viewer.js"></script>
-  </head>
+<head>
+  <meta charset="utf-8">
+  <title>3D Model Viewer - Step File</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #5c5555;
+      font-family: Geneva, sans-serif;
+      color: rgba(0, 0, 0, 0.7);
+    }
+    #viewer {
+      width: 100vw;
+      height: 100vh;
+      background: #9b9494;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+  <script src="../dist/js-3d-model-viewer.js"></script>
+</head>
 
-  <body>
-    <div id="viewer"></div>
-    <script>
-      // Initialize the 3D model viewer
-      var modelPlayer = this.Js3dModelViewer;
-      var viewerElement = document.getElementById('viewer');
-      var scene = modelPlayer.prepareScene(viewerElement, {
-        grid: false, // Disable grid for simplicity
-        background: '#D3D3D3' // Light grey background
-      });
+<body>
+  <div id="viewer"></div>
+  <script>
+    var modelPlayer = this.Js3dModelViewer;
+    var viewerElement = document.getElementById('viewer');
 
-      // Automatically load Sample 2 on page load
-      modelPlayer.loadObject(
-        scene,
-        'src\assets\try.obj', 
-        'src\assets\try.mtl',
-        function () {
-          console.log("Sample 2 loaded successfully");
-        }
-      );
+    var scene = modelPlayer.prepareScene(viewerElement, {
+      grid: false,
+      background: '#D3D3D3'
+    });
 
-      // Ensure full-screen mode is always enabled
-      modelPlayer.goFullScreen(viewerElement);
-    </script>
-  </body>
+    // Load your model - fix the path here:
+    modelPlayer.loadObject(
+      scene,
+      '../src/assets/try.obj',
+      '../src/assets/try.mtl',
+      function () {
+        console.log("Try model loaded successfully");
+      }
+    );
+
+    modelPlayer.goFullScreen(viewerElement);
+  </script>
+</body>
 </html>
