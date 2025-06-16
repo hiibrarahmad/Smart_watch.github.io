@@ -1,51 +1,68 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>3D Model Viewer</title>
     <style>
+      html, body { margin:0; padding:0; height:100%; }
       body {
-        margin: 0;
-        padding: 0;
-        background: #5c5555; /* Light grey background */
+        background: #5c5555;
         font-family: Geneva, sans-serif;
-        color: rgba(0, 0, 0, 0.7); /* Semi-transparent black text */
+        color: rgba(0,0,0,0.7);
       }
       #viewer {
-        width: 100vw; 
-        height: 100vh; 
-        background: #9b9494; /* Light grey background */
+        width:100%; height:100%;
+        background:#9b9494;
+        display:flex; align-items:center; justify-content:center;
+        position:relative;
       }
-      canvas {
-        display: block;
+      #viewer canvas { display:block; }
+      #loading {
+        position:absolute;
+        padding:1em;
+        background:rgba(255,255,255,0.8);
+        border-radius:4px;
       }
     </style>
     <script src="./dist/js-3d-model-viewer.js"></script>
   </head>
-
   <body>
-    <div id="viewer"></div>
+    <div id="viewer">
+      <div id="loading">Loading 3D model…</div>
+    </div>
+
     <script>
-      // Initialize the 3D model viewer
-      var modelPlayer = this.Js3dModelViewer;
-      var viewerElement = document.getElementById('viewer');
-      var scene = modelPlayer.prepareScene(viewerElement, {
-        grid: false, // Disable grid for simplicity
-        background: '#D3D3D3' // Light grey background
+      // wait for the DOM so "./src/..." is correct
+      document.addEventListener('DOMContentLoaded', () => {
+        const viewer = document.getElementById('viewer');
+        const loading = document.getElementById('loading');
+
+        // 1. create the WebGL canvas
+        const scene = Js3dModelViewer.prepareScene(viewer, {
+          grid: false,
+          background: '#D3D3D3'
+        });
+
+        // 2. once the canvas is in place, clear the message
+        loading.style.display = 'none';
+
+        // 3. point at the EXACT files you see under src/assets/
+        const objUrl = '/src/assets/sample_02.obj';
+        const mtlUrl = '/src/assets/sample_02.mtl';
+        console.log('📡 fetching:', objUrl, mtlUrl);
+
+        // 4. load with the 4-arg signature
+        Js3dModelViewer.loadObject(
+          scene,
+          objUrl,
+          mtlUrl,
+          () => { console.log('✅ model loaded successfully'); }
+        );
+
+        // 5. (optional) fullscreen
+        try { Js3dModelViewer.goFullScreen(viewer); }
+        catch(e) { console.warn('fullscreen failed', e); }
       });
-
-      // Automatically load Sample 2 on page load
-      modelPlayer.loadObject(
-        scene,
-        'src\assets\sample_02.obj', 
-        'src\assets\sample_03.mtl',
-        function () {
-          console.log("Sample 2 loaded successfully");
-        }
-      );
-
-      // Ensure full-screen mode is always enabled
-      modelPlayer.goFullScreen(viewerElement);
     </script>
   </body>
 </html>
